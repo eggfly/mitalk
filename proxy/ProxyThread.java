@@ -27,7 +27,7 @@ public class ProxyThread extends Thread {
 	public void sendPolicy() {
 		try {
 			out.write(policy.getBytes());
-			System.err.println("Sentcy");
+			System.err.println("Policy sent.");
 		} catch (IOException ex) {
 			System.err.println("Erroring policy file");
 		}
@@ -43,13 +43,17 @@ public class ProxyThread extends Thread {
 		    while(((count=in.read(buf))>0)&&!isInterrupted()) {
 		    	if (inFromLocal && count==23 && new String(buf).startsWith("<policy-file-request/>")) {
 				// send policy file back.. don't forward this to other port
-				System.err.println("Gotcy request");
+				System.err.println("Got policy request.");
 				peer.sendPolicy();
+				out.flush();
 				inSock.close();
+				outSock.close();
+				System.err.println("inSock and outSock closed.");
+				break;
 			}
 			else {
 				out.write(buf,0,count);
-				//System.err.println(count+" bytes "+(inFromLocal?"sent":"received"));
+				System.err.println(count+" bytes "+(inFromLocal?"sent":"received"));
 			}
 		    }
 		} catch(Exception xc) {
@@ -67,13 +71,14 @@ public class ProxyThread extends Thread {
 		} finally {
 		    // The input and output streams will be closed when the sockets themselves
 		    // are closed.
-		    out.flush();
+			err.println("out.flush()");
+			out.flush();
 		}
 	    } catch(Exception xc) {
 		err.println(header+":"+xc);
 		xc.printStackTrace();
 	    }
-	    synchronized(lock) {
+	// synchronized(lock) {
 		done=true;
 		try {
 		    if((peer==null)||peer.isDone()) {
@@ -81,6 +86,7 @@ public class ProxyThread extends Thread {
 			// if _both_ peers are done
 			inSock.close();
 			outSock.close();
+			err.println("inCock.close(); outSock.close();");
 		    }
 		    else 
 			// Signal the peer (if any) that we're done on this side of the connection
@@ -92,7 +98,7 @@ public class ProxyThread extends Thread {
 		    connections.removeElement(this);
 		}
 	    }
-	}
+	// }
  
 	public boolean isDone() {
 	    return done;
@@ -124,7 +130,7 @@ public class ProxyThread extends Thread {
     // This proxy's server socket
     private ServerSocket srvSock;
     // Debug flag
-    private boolean debug=false;
+    private boolean debug=true;
  
     // Log streams for output and error messages
     private PrintStream out;
@@ -154,6 +160,7 @@ public class ProxyThread extends Thread {
 	try {
 	    while(!isInterrupted()) {
 		Socket serverSocket=srvSock.accept();
+		err.println("Socket serverSocket=srvSock.accept();");
 		try {
 		    serverSocket.setSoLinger(true,lingerTime);
 		    Socket clientSocket=new Socket(dstAddr,dstPort);
