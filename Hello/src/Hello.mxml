@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   minWidth="955" minHeight="600">
+	<fx:Script>
+		<![CDATA[
+			import com.eggfly.test.Test
+			private var socket:Socket;
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				button1.label = "sss";
+				socket = new Socket();
+				socket.addEventListener(Event.CONNECT, onConnected);
+				socket.addEventListener(Event.CLOSE, onClosed);
+				socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketDataReceived );
+				socket.addEventListener( IOErrorEvent.IO_ERROR, onIOError );
+				socket.addEventListener( SecurityErrorEvent.SECURITY_ERROR, onSecurityError );
+				
+				socket.connect("www.baidu.com", 80);
+				socket.writeUTFBytes("GET / HTTP/1.1\r\n");
+				socket.writeUTFBytes("Host: www.baidu.com\r\n\r\n");
+				socket.flush();
+				
+				Test.verbose();
+			}
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				button2.label = "sss2";
+				// Security.loadPolicyFile("xmlsocket://ubuntu.host8.tk:843");
+				socket = new Socket();
+				socket.addEventListener(Event.CONNECT, onConnected);
+				socket.addEventListener(Event.CLOSE, onClosed);
+				socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketDataReceived );
+				socket.addEventListener( IOErrorEvent.IO_ERROR, onIOError );
+				socket.addEventListener( SecurityErrorEvent.SECURITY_ERROR, onSecurityError );
+				socket.connect("ubuntu.host8.tk", 5222);
+				socket.writeUTFBytes("<stream:stream to='xiaomi.com' xmlns:stream='xm' xmlns='xm' model='OptiPlex 990' version='102' connpt='wifi' host='58.68.235.232'>");
+				socket.flush();
+				
+				Test.verbose();
+			}
+			private function onConnected(event:Event): void
+			{
+				myText.appendText("connected\n");
+			}
+			private function onClosed(event:Event): void
+			{
+				myText.appendText("closed\n");
+			}
+			private function onSocketDataReceived(event:ProgressEvent): void
+			{
+				var bytedata:ByteArray = new ByteArray();
+				// The default value of 0 causes all available data to be read.
+				socket.readBytes( bytedata );
+				trace(bytedata.toString());
+				
+				myText.appendText(bytedata.toString()+"\n");
+			}
+			
+			/**
+			 * This fires the standard dispatchError method
+			 *
+			 * @param	event
+			 */
+			protected function onIOError( event:IOErrorEvent ):void
+			{
+				myText.appendText("onIOError");
+				myText.appendText(event.toString());
+			}
+			
+			/**
+			 * @private
+			 *
+			 * @param	event
+			 */
+			protected function onSecurityError( event:SecurityErrorEvent ):void
+			{
+				myText.appendText("onSecurityError");
+				myText.appendText(event.toString());
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button id="button1" label="TEST1" click="button1_clickHandler(event)"/>
+	<s:Button id="button2" label="TEST2" click="button2_clickHandler(event)"/>
+	<s:TextArea id="myText" x="10" y="10" width="285" height="250"/>
+</s:Application>
