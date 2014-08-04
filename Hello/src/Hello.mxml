@@ -2,90 +2,84 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
 			   xmlns:s="library://ns.adobe.com/flex/spark"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   initialize="application1_initializeHandler(event)"
 			   minWidth="955" minHeight="600">
 	<fx:Script>
 		<![CDATA[
-			import com.eggfly.test.Test
+			import com.eggfly.test.Test1;
+			
+			import mx.events.FlexEvent;
 			private var socket:Socket;
+			private var t:Test1;
 			protected function button1_clickHandler(event:MouseEvent):void
 			{
-				button1.label = "sss";
-				socket = new Socket();
-				socket.addEventListener(Event.CONNECT, onConnected);
-				socket.addEventListener(Event.CLOSE, onClosed);
-				socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketDataReceived );
-				socket.addEventListener( IOErrorEvent.IO_ERROR, onIOError );
-				socket.addEventListener( SecurityErrorEvent.SECURITY_ERROR, onSecurityError );
-				
-				socket.connect("www.baidu.com", 80);
-				socket.writeUTFBytes("GET / HTTP/1.1\r\n");
-				socket.writeUTFBytes("Host: www.baidu.com\r\n\r\n");
-				socket.flush();
-				
-				Test.verbose();
+				t.foo1();
 			}
 			protected function button2_clickHandler(event:MouseEvent):void
 			{
-				button2.label = "sss2";
 				// Security.loadPolicyFile("xmlsocket://ubuntu.host8.tk:843");
-				socket = new Socket();
-				socket.addEventListener(Event.CONNECT, onConnected);
-				socket.addEventListener(Event.CLOSE, onClosed);
-				socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketDataReceived );
-				socket.addEventListener( IOErrorEvent.IO_ERROR, onIOError );
-				socket.addEventListener( SecurityErrorEvent.SECURITY_ERROR, onSecurityError );
-				socket.connect("ubuntu.host8.tk", 5222);
-				socket.writeUTFBytes("<stream:stream to='xiaomi.com' xmlns:stream='xm' xmlns='xm' model='OptiPlex 990' version='102' connpt='wifi' host='58.68.235.232'>");
-				socket.flush();
-				
-				Test.verbose();
+				t.foo2();
 			}
-			private function onConnected(event:Event): void
+			protected function button3_clickHandler(event:MouseEvent):void
 			{
-				myText.appendText("connected\n");
+				var obj:SharedObject = SharedObject.getLocal("local", "/", false);
+				text2.appendText(obj.toString());
+				var str:String = "a string"
+				for(var i:int = 0;i<10;i++) {
+					str += str;
+					// trace(str);
+				}
+				obj.data.a = str;
+				obj.flush();
+				for(var key:Object in obj.data) {
+					text2.appendText(key.toString());
+					var v:String = obj.data[key];
+					text2.appendText(v.length.toString());
+					// text2.appendText("undefined");
+				}
+				text2.appendText(obj.data.toString());
+				// text2.appendText(SharedObject.getDiskUsage("local").toString());
 			}
-			private function onClosed(event:Event): void
+			protected function button4_clickHandler(event:MouseEvent):void
 			{
-				myText.appendText("closed\n");
-			}
-			private function onSocketDataReceived(event:ProgressEvent): void
-			{
-				var bytedata:ByteArray = new ByteArray();
-				// The default value of 0 causes all available data to be read.
-				socket.readBytes( bytedata );
-				trace(bytedata.toString());
-				
-				myText.appendText(bytedata.toString()+"\n");
+				// Security.loadPolicyFile("xmlsocket://ubuntu.host8.tk:843");
+				t.foo4();
 			}
 			
-			/**
-			 * This fires the standard dispatchError method
-			 *
-			 * @param	event
-			 */
-			protected function onIOError( event:IOErrorEvent ):void
+			protected function text1_addedToStageHandler(event:Event):void
 			{
-				myText.appendText("onIOError");
-				myText.appendText(event.toString());
+				text1.text = "<stream:stream to='xiaomi.com' xmlns:stream='xm' xmlns='xm' model='OptiPlex 990' version='102' connpt='wifi' host='58.68.235.232'>";
 			}
 			
-			/**
-			 * @private
-			 *
-			 * @param	event
-			 */
-			protected function onSecurityError( event:SecurityErrorEvent ):void
+			protected function application1_initializeHandler(event:FlexEvent):void
 			{
-				myText.appendText("onSecurityError");
-				myText.appendText(event.toString());
+				this.t = new Test1(this);
 			}
+			
 		]]>
 	</fx:Script>
 	
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:Button id="button1" label="TEST1" click="button1_clickHandler(event)"/>
-	<s:Button id="button2" label="TEST2" click="button2_clickHandler(event)"/>
-	<s:TextArea id="myText" x="10" y="10" width="285" height="250"/>
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	<s:SkinnableContainer>
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		<s:Button id="button1" label="TEST1" click="button1_clickHandler(event)"/>
+		<s:Button id="button2" label="TEST2" click="button2_clickHandler(event)"/>
+		<s:Button id="button3" label="TEST3" click="button3_clickHandler(event)"/>
+		<s:Button id="button4" label="xmpp debug send" click="button4_clickHandler(event)"/>
+	</s:SkinnableContainer>
+
+	<s:TextArea id="text1" x="10" y="10" width="95%" height="95%"
+				addedToStage="text1_addedToStageHandler(event)" color="blue" lineBreak="explicit"
+				text=""/>
+	<s:TextArea id="text2" x="10" y="10" width="95%" height="95%" color="blue" lineBreak="explicit"
+				text="server:&#xa;"/>
+	<s:TextArea id="logText" x="10" y="10" width="95%" height="95%" color="blue" lineBreak="explicit"
+				text="log:&#xa;"/>
 </s:Application>

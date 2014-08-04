@@ -27,10 +27,10 @@
 	</mx:TitleWindow>-->
 	<!--	<s:BorderContainer>
 	</s:BorderContainer>-->
-	<s:Panel width="95%" height="95%" horizontalCenter="0" title="BorderContainer Component Example"
+	<!--<s:Panel width="95%" height="95%" horizontalCenter="0" title="BorderContainer Component Example"
 			 verticalCenter="0"> 
-		<!--<s:layoutMatrix3D>
-		</s:layoutMatrix3D>-->
+		<s:layoutMatrix3D>
+		</s:layoutMatrix3D>
 		<s:BorderContainer left="10" right="10" top="10" bottom="10" backgroundColor="red"
 						   borderStyle="inset" borderWeight="4" cornerRadius="10">
 			<s:layout>
@@ -42,5 +42,5 @@
 			<s:Button label="Button 4"/>
 			<s:Label text="text1"/>
 		</s:BorderContainer> 
-	</s:Panel>
+	</s:Panel>-->
 </s:Application>
