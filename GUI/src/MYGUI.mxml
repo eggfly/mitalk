@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application 
+				xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+			backgroundColor="#E2E2E2">
+	<fx:Script>
+		<![CDATA[
+			import com.facebook.graph.Facebook;
+			import com.facebook.graph.data.FacebookAuthResponse;
+			import com.pixelbreaker.ui.osx.MacMouseWheel;
+			import com.yourpalmark.chat.ChatManager;
+			import com.yourpalmark.chat.data.ChatRoom;
+			import com.yourpalmark.chat.data.LoginCredentials;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.ResizeEvent;
+			import mx.managers.PopUpManager;
+			
+			import org.igniterealtime.xiff.collections.events.CollectionEvent;
+			import org.igniterealtime.xiff.conference.Room;
+			import org.igniterealtime.xiff.core.UnescapedJID;
+			import org.igniterealtime.xiff.core.XMPPConnection;
+			import org.igniterealtime.xiff.data.Message;
+			import org.igniterealtime.xiff.data.Presence;
+			import org.igniterealtime.xiff.data.im.RosterGroup;
+			import org.igniterealtime.xiff.data.im.RosterItemVO;
+			import org.igniterealtime.xiff.events.ConnectionSuccessEvent;
+			import org.igniterealtime.xiff.events.DisconnectionEvent;
+			import org.igniterealtime.xiff.events.IncomingDataEvent;
+			import org.igniterealtime.xiff.events.InviteEvent;
+			import org.igniterealtime.xiff.events.LoginEvent;
+			import org.igniterealtime.xiff.events.MessageEvent;
+			import org.igniterealtime.xiff.events.OutgoingDataEvent;
+			import org.igniterealtime.xiff.events.PresenceEvent;
+			import org.igniterealtime.xiff.events.RegistrationSuccessEvent;
+			import org.igniterealtime.xiff.events.RosterEvent;
+			import org.igniterealtime.xiff.events.XIFFErrorEvent;
+			
+			private var connection:XMPPConnection = new XMPPConnection();
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				connection.server = "58.68.235.232";
+				connection.port = 5222;
+				connection.addEventListener(ConnectionSuccessEvent.CONNECT_SUCCESS, onSocketConnected);
+				connection.addEventListener(DisconnectionEvent.DISCONNECT, onSocketDisconnected);
+				connection.addEventListener(IncomingDataEvent.INCOMING_DATA, onIncomingData);
+				connection.addEventListener(OutgoingDataEvent.OUTGOING_DATA, onOutgoingData);
+				connection.addEventListener( MessageEvent.MESSAGE, onEvent);
+				connection.connect();
+			}
+			protected function onSocketConnected( event:ConnectionSuccessEvent ):void
+			{
+				trace(event);
+			}
+			protected function onSocketDisconnected( event:DisconnectionEvent ):void
+			{
+				trace(event);
+			}
+			protected function onIncomingData( event:IncomingDataEvent ):void
+			{
+				trace(event);
+				trace(event.data.toString());
+			}
+			protected function onOutgoingData( event:OutgoingDataEvent ):void
+			{
+				trace(event);
+				trace(event.data.toString());
+			}
+			protected function onEvent( event:Event ):void
+			{
+				trace(event);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Panel width="95%" height="95%">
+		<s:Button label="click" click="button1_clickHandler(event)" />
+	</s:Panel>
+</s:Application>

@@ -6,6 +6,5 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<local:Custom>
-		
 	</local:Custom>
 </s:Application>
