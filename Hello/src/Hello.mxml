@@ -7,6 +7,7 @@
 	<fx:Script>
 		<![CDATA[
 			import com.eggfly.test.Test1;
+			import com.eggfly.test.BatchXmpp;
 			
 			import mx.events.FlexEvent;
 			private var socket:Socket;
@@ -45,6 +46,11 @@
 				// Security.loadPolicyFile("xmlsocket://ubuntu.host8.tk:843");
 				t.foo4();
 			}
+			protected function button5_clickHandler(event:MouseEvent):void
+			{
+				// Security.loadPolicyFile("xmlsocket://ubuntu.host8.tk:843");
+				t.foo4();
+			}
 			
 			protected function text1_addedToStageHandler(event:Event):void
 			{
@@ -73,6 +79,7 @@
 		<s:Button id="button2" label="TEST2" click="button2_clickHandler(event)"/>
 		<s:Button id="button3" label="TEST3" click="button3_clickHandler(event)"/>
 		<s:Button id="button4" label="xmpp debug send" click="button4_clickHandler(event)"/>
+		<s:Button id="button5" label="batch xmpp" click="button5_clickHandler(event)"/>
 	</s:SkinnableContainer>
 
 	<s:TextArea id="text1" x="10" y="10" width="95%" height="95%"
@@ -82,4 +89,9 @@
 				text="server:&#xa;"/>
 	<s:TextArea id="logText" x="10" y="10" width="95%" height="95%" color="blue" lineBreak="explicit"
 				text="log:&#xa;"/>
+<!--	<s:List>
+		<s:dataProvider>
+			
+		</s:dataProvider>
+	</s:List>-->
 </s:Application>
