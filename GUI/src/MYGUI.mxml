@@ -42,8 +42,12 @@
 			
 			private var connection:XMPPConnection = new XMPPConnection();
 			
+			// "<stream:stream to='xiaomi.com' xmlns:stream='xm' xmlns='xm' model='OptiPlex 990' version='102' connpt='wifi' host='58.68.235.232'>"
+			
 			protected function button1_clickHandler(event:MouseEvent):void
 			{
+				// three below are all must
+				connection.domain = "xiaomi.com";
 				connection.server = "58.68.235.232";
 				connection.port = 5222;
 				connection.addEventListener(ConnectionSuccessEvent.CONNECT_SUCCESS, onSocketConnected);

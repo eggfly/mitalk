@@ -25,20 +25,45 @@
  */
 package org.igniterealtime.xiff.core
 {
-	import flash.events.*;
-	import flash.net.*;
-	import flash.utils.*;
-
-	import org.igniterealtime.xiff.auth.*;
-	import org.igniterealtime.xiff.data.*;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.events.TimerEvent;
+	import flash.net.Socket;
+	import flash.utils.ByteArray;
+	import flash.utils.Timer;
+	import flash.utils.getTimer;
+	
+	import org.igniterealtime.xiff.auth.Anonymous;
+	import org.igniterealtime.xiff.auth.DigestMD5;
+	import org.igniterealtime.xiff.auth.SASLAuth;
+	import org.igniterealtime.xiff.data.Extension;
+	import org.igniterealtime.xiff.data.ExtensionClassRegistry;
+	import org.igniterealtime.xiff.data.IExtension;
+	import org.igniterealtime.xiff.data.IQ;
+	import org.igniterealtime.xiff.data.IXMPPStanza;
+	import org.igniterealtime.xiff.data.Message;
+	import org.igniterealtime.xiff.data.Presence;
+	import org.igniterealtime.xiff.data.XMLStanza;
+	import org.igniterealtime.xiff.data.XMPPStanza;
 	import org.igniterealtime.xiff.data.auth.AuthExtension;
 	import org.igniterealtime.xiff.data.bind.BindExtension;
+	import org.igniterealtime.xiff.data.disco.InfoDiscoExtension;
 	import org.igniterealtime.xiff.data.ping.PingExtension;
 	import org.igniterealtime.xiff.data.session.SessionExtension;
-	import org.igniterealtime.xiff.data.disco.InfoDiscoExtension;
-	import org.igniterealtime.xiff.events.*;
-	import org.igniterealtime.xiff.util.ICompressor;
+	import org.igniterealtime.xiff.events.ConnectionSuccessEvent;
+	import org.igniterealtime.xiff.events.DisconnectionEvent;
+	import org.igniterealtime.xiff.events.IQEvent;
+	import org.igniterealtime.xiff.events.IncomingDataEvent;
+	import org.igniterealtime.xiff.events.LoginEvent;
+	import org.igniterealtime.xiff.events.MessageEvent;
+	import org.igniterealtime.xiff.events.OutgoingDataEvent;
+	import org.igniterealtime.xiff.events.PresenceEvent;
+	import org.igniterealtime.xiff.events.XIFFErrorEvent;
 	import org.igniterealtime.xiff.util.Hex;
+	import org.igniterealtime.xiff.util.ICompressor;
 
 	/**
 	 * Dispatched when the connection is successfully made to the server.
@@ -663,8 +688,10 @@ package org.igniterealtime.xiff.core
 				openingStreamTag += '<stream';
 				closingStreamTag = '</stream:stream>';
 			}
-
-			openingStreamTag += ':stream xmlns="' + XMPPStanza.CLIENT_NAMESPACE + '" ';
+			
+//			openingStreamTag += ':stream xmlns="' + XMPPStanza.CLIENT_NAMESPACE + '" ';
+			// eggfly mod
+			openingStreamTag += ':stream xmlns="' + "xm" + '" ';
 
 			if ( type == STREAM_TYPE_FLASH || type == STREAM_TYPE_FLASH_TERMINATED )
 			{
@@ -672,13 +699,15 @@ package org.igniterealtime.xiff.core
 			}
 			else
 			{
-				openingStreamTag += 'xmlns:stream="' + XMPPStanza.NAMESPACE_STREAM + '"';
+				// openingStreamTag += 'xmlns:stream="' + XMPPStanza.NAMESPACE_STREAM + '"';
+				// eggfly mod
+				openingStreamTag += 'xmlns:stream="' + "xm" + '"';
 			}
 
 			// TODO: xml:xmlns ?
-			openingStreamTag += ' to="' + domain + '"'
+			openingStreamTag += ' to="'+ domain + '"'+ ' host="' + server + '"'
 				+ ' xml:lang="' + XMPPStanza.XML_LANG + '"'
-				+ ' version="' + XMPPStanza.CLIENT_VERSION + '"';
+				+ ' version="' + "102" /* XMPPStanza.CLIENT_VERSION */ + '"';
 
 			if ( type == STREAM_TYPE_FLASH_TERMINATED || type == STREAM_TYPE_STANDARD_TERMINATED )
 			{
@@ -1414,6 +1443,12 @@ package org.igniterealtime.xiff.core
 				xmlData.setNamespace( XMLStanza.DEFAULT_NS );
 				xmlData.normalize();
 
+				var challenge:uint = xmlData.attribute("challenge");
+				if (challenge != 0)
+				{
+					step1HandleChallenge(challenge);
+				}
+				// force added stream
 				for each (var child:XML in xmlData.children())
 				{
 					// Read the data and send it to the appropriate parser
@@ -1422,6 +1457,9 @@ package org.igniterealtime.xiff.core
 			}
 		}
 
+		private function step1HandleChallenge(challenge:uint):void
+		{
+		}
 		/**
 		 * Check if the incoming data is complete once added to any existing
 		 * incoming data.
