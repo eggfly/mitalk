@@ -705,8 +705,9 @@ package org.igniterealtime.xiff.core
 			}
 
 			// TODO: xml:xmlns ?
-			openingStreamTag += ' to="'+ domain + '"'+ ' host="' + server + '"'
-				+ ' xml:lang="' + XMPPStanza.XML_LANG + '"'
+			openingStreamTag += ' to="'+ domain + '"'
+				+ ' host="' + server + '"'
+//				+ ' xml:lang="' + XMPPStanza.XML_LANG + '"'
 				+ ' version="' + "102" /* XMPPStanza.CLIENT_VERSION */ + '"';
 
 			if ( type == STREAM_TYPE_FLASH_TERMINATED || type == STREAM_TYPE_STANDARD_TERMINATED )
