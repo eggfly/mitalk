@@ -25,6 +25,8 @@
  */
 package org.igniterealtime.xiff.core
 {
+	import com.hurlant.crypto.hash.SHA1;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -33,8 +35,11 @@ package org.igniterealtime.xiff.core
 	import flash.events.TimerEvent;
 	import flash.net.Socket;
 	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
+	
+	import mx.utils.Base64Encoder;
 	
 	import org.igniterealtime.xiff.auth.Anonymous;
 	import org.igniterealtime.xiff.auth.DigestMD5;
@@ -1444,8 +1449,8 @@ package org.igniterealtime.xiff.core
 				xmlData.setNamespace( XMLStanza.DEFAULT_NS );
 				xmlData.normalize();
 
-				var challenge:uint = xmlData.attribute("challenge");
-				if (challenge != 0)
+				var challenge:String = xmlData.attribute("challenge");
+				if (challenge != "")
 				{
 					step1HandleChallenge(challenge);
 				}
@@ -1457,10 +1462,153 @@ package org.igniterealtime.xiff.core
 				}
 			}
 		}
-
-		private function step1HandleChallenge(challenge:uint):void
+		
+		/*
+		public function testCalcSignature(): void
 		{
+			// Count = 10
+//			[0]: {[challenge, 3002078701]}
+//			[1]: {[token, Rdkmr7KwP9RvJBJRTCfH9sCuAj6vIhRh0NdSW94hMeJk7bQrWvSXGrrlYaJSxd3gcAepTaDNpjsDY9TAa5sXetSybdzo1oUZyCy1+3sCgk0=]}
+//			[2]: {[kick, 0]}
+//			[3]: {[client_attrs, ]}
+//			[4]: {[cloud_attrs, muc:2,ver:ws8-Lenovo-2.1.39-x1,v:6,mseq:497985637115367424]}
+//			[5]: {[chid, 1]}
+//			[6]: {[id, pevQkvGjyAdruYzo]}
+//			[7]: {[from, 10223296@xiaomi.com/ws8kRVAzg]}
+//			[8]: {[to, xiaomi.com]}
+//			[9]: {[pf, conn:1]}
+			var params:Dictionary = new Dictionary();
+			params["challenge"] = "3002078701";
+			params["token"] = "Rdkmr7KwP9RvJBJRTCfH9sCuAj6vIhRh0NdSW94hMeJk7bQrWvSXGrrlYaJSxd3gcAepTaDNpjsDY9TAa5sXetSybdzo1oUZyCy1+3sCgk0=";
+			params["kick"] = "0";
+			params["client_attrs"] = "";
+			params["cloud_attrs"] = "muc:2,ver:ws8-Lenovo-2.1.39-x1,v:6,mseq:497985637115367424";
+			params["chid"] = "1";
+			params["id"] = "Ksi5DebNtLEKjucY";
+			params["from"] = "10223296@xiaomi.com/ws8kRVAzg";
+			params["to"] = "xiaomi.com";
+			params["pf"] = "conn:1";
+			
+			var result:String = this.calcSignature("XIAOMI-PASS", params, "5vq9f6v45ixSjka+Sg+lqA==");
+			trace(result);
+			trace(result == "pWHMmNzSs1HMrDiuEe+LtRLFGDs=");
 		}
+		*/
+		private function step1HandleChallenge(challenge:String): void
+		{
+			var method:String  = "XIAOMI-PASS";
+			var params:Dictionary = new Dictionary();
+			
+			params["challenge"] = challenge;
+			// params["challenge"] = "742051932";
+			params["token"] = "Rdkmr7KwP9RvJBJRTCfH9sCuAj6vIhRh0NdSW94hMeJk7bQrWvSXGrrlYaJSxd3gcAepTaDNpjsDY9TAa5sXetSybdzo1oUZyCy1+3sCgk0=";
+			params["kick"] = "0";
+			params["client_attrs"] = "";
+			params["cloud_attrs"] = "muc:2,ver:ws8-Lenovo-2.1.39-x1,v:6,mseq:497985637115367424";
+			params["chid"] = "1";
+			params["id"] = "Ksi5DebNtLEKjucY";
+			params["from"] = "10223296@xiaomi.com/ws8kRVAzg";
+			params["to"] = "xiaomi.com";
+			params["pf"] = "conn:1";
+			
+			var signature:String = this.calcSignature(method, params, "5vq9f6v45ixSjka+Sg+lqA==");
+
+			/*param.challenge = challenge;
+			param.token = "";
+			param.kick = "0";
+			param.client_attrs = "";	// empty
+			param.cloud_attrs = "";		// muc and sth
+			param.chid = "1";			// chid: mitalk
+			param.id = "uidxxxxx";		// uid bytes 16
+			param.from = "";			// from ..
+			param.to = "xiaomi.com"	// domain
+			param.pf = "conn: " + "0";	// conn
+*/
+//			string method = "XIAOMI-PASS";
+//			Dictionary<string, string> param = new Dictionary<string, string>();
+//			param["challenge"] = message.Attribute("challenge").Value;
+//			param["token"] = ServiceLocator.Resolve<IUserInfoService>().ServicToken;
+//			param["kick"] = "0";
+//			param["client_attrs"] = string.Empty;
+//			param["cloud_attrs"] = string.Format("muc:2,ver:{0},v:6,mseq:{1}", ServiceLocator.Resolve<IApplicationInfoService>().FullClientVersion, ServiceLocator.Resolve<IUserInfoService>().MaxMessageSequence);
+//			param["chid"] = "1";
+//			param["id"] = CommonUtils.GetUniqueId(16);
+//			param["from"] = ServiceLocator.Resolve<IUserInfoService>().MyMiliaoDomianIdWithResource;
+//			param["to"] = "xiaomi.com";
+//			param["pf"] = string.Format("conn:{0}", this.fallbackCount);
+//			
+//			////string signature = message.Attribute("challenge").Value + "_" + ServiceLocator.Resolve<IUserInfoService>().DynamicalSalt;
+//			////signature = Convert.ToBase64String(MD5Core.GetHash(signature));
+//			
+//			// the new signature must be used with new xiaomi passport login.
+//			// todo: use xiaomi passport to login and change to new algrithom to calculate signature.
+//			string signature = this.CalculateSignature(method, param, ServiceLocator.Resolve<IUserInfoService>().ServicSecurity);
+//			
+//			XDocument response = new XDocument();
+//			response.Add(new XElement(
+//				"bind",
+//				new XAttribute("chid", param["chid"]),
+//				new XAttribute("id", param["id"]),
+//				new XAttribute("from", param["from"]),
+//				new XAttribute("to", param["to"]),
+//				new XElement("token", param["token"]),
+//				new XElement("kick", param["kick"]),
+//				new XElement("sig", signature),
+//				new XElement("method", method),
+//				new XElement("client_attrs", param["client_attrs"]),
+//				new XElement("cloud_attrs", param["cloud_attrs"]),
+//				new XElement("pf", param["pf"])
+//			));
+//			
+//			await this.SendAsync(response.ToString()).ConfigureAwait(false);
+			var bind:XML = new XML("<bind />");
+			bind.@method = method;
+
+//			bind.@challenge = params["challenge"];
+			bind.@chid = params.chid;
+			bind.@id = params.id;
+			bind.@from = params.from;
+			bind.@to = params.to;
+			bind.token = params.token;
+			bind.kick = params.kick;
+			bind.client_attrs = params.client_attrs;
+			bind.cloud_attrs = params.cloud_attrs;
+			bind.pf = params.pf;
+			
+			bind.sig = signature;
+			
+			this.sendXML(bind.toXMLString());
+		}
+		
+		private function calcSignature(method:String, params:Dictionary, salt:String): String
+		{
+			var keys:Array = new Array();
+			for(var key:String in params)
+			{
+				keys.push(key);
+			}
+			keys.sort();
+			
+			var results:Array = new Array();
+			results.push(method);
+			for(var index:String in keys)
+			{
+				var k:String = keys[index];
+				results.push(k+"="+params[k]);				
+			}
+			results.push(salt);
+			
+			var data:String = results.join("&");
+			var dataBytes:ByteArray = new ByteArray();
+			dataBytes.writeUTFBytes(data); 
+			var s:SHA1 = new SHA1();
+			var dataBytesEncrypted:ByteArray = s.hash(dataBytes);
+			var base64Encoder:Base64Encoder = new Base64Encoder();
+			base64Encoder.encodeBytes(dataBytesEncrypted);
+			var final:String = base64Encoder.toString();
+			return final;
+		}
+
 		/**
 		 * Check if the incoming data is complete once added to any existing
 		 * incoming data.

@@ -57,6 +57,11 @@
 				connection.addEventListener( MessageEvent.MESSAGE, onEvent);
 				connection.connect();
 			}
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// three below are all must
+				// connection.testCalcSignature();
+			}
 			protected function onSocketConnected( event:ConnectionSuccessEvent ):void
 			{
 				trace(event);
@@ -85,6 +90,10 @@
 	
 	
 	<s:Panel width="95%" height="95%">
-		<s:Button label="click" click="button1_clickHandler(event)" />
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+		<s:Button id="button1" label="click" click="button1_clickHandler(event)" />
+		<s:Button id="button2" label="click" click="button2_clickHandler(event)" />
 	</s:Panel>
 </s:Application>
