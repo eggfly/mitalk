@@ -47,7 +47,7 @@ package com.yourpalmark.chat
 		protected var registrationData:Object;
 		protected var keepAliveTimer:Timer;
 
-		protected var _connection:XMPPTLSConnection;
+		protected var _connection:XMPPConnection;
 		protected var _inviteListener:InviteListener;
 		protected var _inbandRegister:InBandRegistrator;
 		protected var _roster:Roster;
@@ -79,7 +79,7 @@ package com.yourpalmark.chat
 			return value;
 		}
 
-		public function get connection():XMPPTLSConnection
+		public function get connection():XMPPConnection
 		{
 			return _connection;
 		}
@@ -128,7 +128,7 @@ package com.yourpalmark.chat
 
 			Security.loadPolicyFile( "xmlsocket://" + ChatManager.serverName + ":" + ChatManager.serverPort );
 			registerUser = false;
-			connection.tls = ChatManager.useTls;
+			// connection.tls = ChatManager.useTls;
 			connection.username = XFacebookPlatform.fb_app_id != null ? "u" + username : username;
 			connection.password = credentials.password;
 			connection.domain = domain;
@@ -181,11 +181,11 @@ package com.yourpalmark.chat
 
 		protected function setupConnection():void
 		{
-			_connection = new XMPPTLSConnection();
+			_connection = new XMPPConnection();
 			_connection.compressor = new Zlib();
 			var config:TLSConfig = new TLSConfig( TLSEngine.CLIENT );
-			config.ignoreCommonNameMismatch = true;
-			_connection.config = config;
+			// config.ignoreCommonNameMismatch = true;
+			// _connection.config = config;
 			addConnectionListeners();
 		}
 

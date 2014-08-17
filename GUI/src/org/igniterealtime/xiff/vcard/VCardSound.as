@@ -70,7 +70,8 @@ package org.igniterealtime.xiff.vcard
 			{
 				try
 				{
-					_bytes = Base64.decodeToByteArrayB( value );
+					// eggfly mod
+					// _bytes = Base64.decodeToByteArrayB( value );
 				}
 				catch( error:Error )
 				{

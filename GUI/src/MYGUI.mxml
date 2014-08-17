@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application 
-				xmlns:fx="http://ns.adobe.com/mxml/2009"
-				xmlns:s="library://ns.adobe.com/flex/spark"
-				xmlns:mx="library://ns.adobe.com/flex/mx"
-			backgroundColor="#E2E2E2">
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   backgroundColor="#E2E2E2">
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.net.URI;
+			import com.adobe.viewsource.ViewSource;
 			import com.facebook.graph.Facebook;
 			import com.facebook.graph.data.FacebookAuthResponse;
 			import com.pixelbreaker.ui.osx.MacMouseWheel;
@@ -20,6 +21,10 @@
 			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
 			
+			import org.httpclient.HttpClient;
+			import org.httpclient.events.HttpDataEvent;
+			import org.httpclient.events.HttpResponseEvent;
+			import org.httpclient.events.HttpStatusEvent;
 			import org.igniterealtime.xiff.collections.events.CollectionEvent;
 			import org.igniterealtime.xiff.conference.Room;
 			import org.igniterealtime.xiff.core.UnescapedJID;
@@ -61,6 +66,62 @@
 			{
 				// three below are all must
 				// connection.testCalcSignature();
+				var client:HttpClient = new HttpClient();
+				client.listener.onStatus = function(event:HttpStatusEvent):void{
+					trace(event.header);
+				}
+				client.listener.onComplete = function(event:HttpResponseEvent):void{
+					trace(event.toString());
+				}
+				var variables:Array = [
+					{name:"hash", value:"04AD8D3A37AB114C3EAC9CE1FD4ED097"},
+					{name:"sid", value: "miliao"},
+					{name:"time", value: "1"},
+					{name:"user", value: "10223296"},
+				];
+				client.postFormData(new URI("https://account.xiaomi.com/pass/serviceLoginAuth"), variables);
+				//client.get(new URI("https://www.alipay.com"));
+			}
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				var request:URLRequest = new URLRequest("https://account.xiaomi.com/pass/serviceLoginAuth");
+				request.method = URLRequestMethod.POST;
+				request.contentType = "application/x-www-form-urlencoded";
+				request.requestHeaders['User-Agent'] = "MiTalk 2.1.39 (OptiPlex 990; Windows8; zh-CN)";
+//				request.followRedirects = false;
+				var params:URLVariables = new URLVariables();
+				params['hash'] = '04AD8D3A37AB114C3EAC9CE1FD4ED097';
+				params['sid'] = 'miliao';
+				params['time'] = '1';
+				params['user'] = "10223296";
+				request.data = params;
+				
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(ProgressEvent.PROGRESS, onLoaderProgress);
+				loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, onHttpStatusReceived);
+				loader.addEventListener(Event.COMPLETE, onRequestComplete);
+				loader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				loader.load(request);
+			}
+			private function onLoaderProgress(event:ProgressEvent): void
+			{
+				trace(event.bytesLoaded + ", " + event.bytesTotal);
+			}
+			private function onHttpStatusReceived(event:HTTPStatusEvent): void
+			{
+				var loader:URLLoader = URLLoader(event.target);
+				loader.close();
+				trace(event.responseURL);
+			}
+			private function onIOError(event:IOErrorEvent): void
+			{
+				trace(event);
+			}
+			private function onRequestComplete(event:Event): void
+			{
+				var loader:URLLoader = URLLoader(event.target);
+				trace("completeHandler: " + loader.data);
+				trace();
 			}
 			protected function onSocketConnected( event:ConnectionSuccessEvent ):void
 			{
@@ -93,7 +154,8 @@
 		<s:layout>
 			<s:VerticalLayout/>
 		</s:layout>
-		<s:Button id="button1" label="click" click="button1_clickHandler(event)" />
-		<s:Button id="button2" label="click" click="button2_clickHandler(event)" />
+		<s:Button id="button1" label="click" click="button1_clickHandler(event)"/>
+		<s:Button id="button2" label="xmpp" click="button2_clickHandler(event)"/>
+		<s:Button id="button3" label="passport request" click="button3_clickHandler(event)"/>
 	</s:Panel>
 </s:Application>
