@@ -19,6 +19,17 @@ package org.httpclient {
       if (!_headers) _headers = [];
     }
     
+	//eggfly mod start
+	public function getValues(name:String): Array {
+		var result:Array = [];
+		for each(var item:Object in _headers) {
+			if (item['name'] == name) {
+				result.push(item);
+			}
+		}
+		return result;
+	}
+	// eggfly mod end
     /**
      * Add a header.
      * @param name

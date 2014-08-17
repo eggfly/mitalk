@@ -73,6 +73,9 @@
 				}
 				client.listener.onComplete = function(event:HttpResponseEvent):void{
 					trace(event.toString());
+					trace(event.response.header.getValues('Set-Cookie')[0]['value']);
+					trace(event.response.header.getValues('Location')[0]['value']);
+					trace(event.response.header.getValues('extension-pragma')[0]['value']);
 				}
 				var variables:Array = [
 					{name:"hash", value:"04AD8D3A37AB114C3EAC9CE1FD4ED097"},
