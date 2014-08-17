@@ -69,6 +69,7 @@
 				var client:HttpClient = new HttpClient();
 				client.listener.onStatus = function(event:HttpStatusEvent):void{
 					trace(event.header);
+					trace(event.code);
 				}
 				client.listener.onComplete = function(event:HttpResponseEvent):void{
 					trace(event.toString());
