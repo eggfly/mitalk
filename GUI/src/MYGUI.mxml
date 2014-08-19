@@ -20,9 +20,11 @@
 			import mx.events.ListEvent;
 			import mx.events.ResizeEvent;
 			import mx.managers.PopUpManager;
+			import mx.utils.StringUtil;
 			
 			import org.httpclient.HttpClient;
 			import org.httpclient.events.HttpDataEvent;
+			import org.httpclient.events.HttpErrorEvent;
 			import org.httpclient.events.HttpResponseEvent;
 			import org.httpclient.events.HttpStatusEvent;
 			import org.igniterealtime.xiff.collections.events.CollectionEvent;
@@ -71,11 +73,36 @@
 					trace(event.header);
 					trace(event.code);
 				}
-				client.listener.onComplete = function(event:HttpResponseEvent):void{
+				client.listener.onError = function(event:HttpErrorEvent):void{
+					trace(event);
+				}
+				client.listener.onComplete = function(event:HttpResponseEvent):void {
 					trace(event.toString());
-					trace(event.response.header.getValues('Set-Cookie')[0]['value']);
-					trace(event.response.header.getValues('Location')[0]['value']);
-					trace(event.response.header.getValues('extension-pragma')[0]['value']);
+					var location:String = "";
+					var userId:String = "";
+					var passToken:String = "";
+					var extensionPragma:String = "";
+					const LocationKey:String = "location";
+					const UserIdKey:String = "userId";
+					const PassTokenKey:String = "passToken";
+					const ExtensionParamKey:String = "extension-pragma";
+					extensionPragma = event.response.header.getValue(ExtensionParamKey);
+					location = event.response.header.getValue(LocationKey);
+					var cookies:Array = event.response.header.getValues('Set-Cookie');
+					for each(var item:Object in cookies) {
+						var vars:Dictionary = parseCookies(item['value']);
+						if (vars[UserIdKey]) {
+							userId = vars[UserIdKey];
+						} else if (vars[PassTokenKey]) {
+							passToken = vars[PassTokenKey];
+						}
+//						var value:String = StringUtil.trim(item['value']);
+//						if (value.indexOf(UserIdKey) >= 0) {
+//							userId = new URLVariables().decode(value)[UserIdKey];
+//						} else if (value.indexOf(PassTokenKey) >= 0) {
+//							passToken = new URLVariables().decode(value)[PassTokenKey];
+//						}
+					}
 				}
 				var variables:Array = [
 					{name:"hash", value:"04AD8D3A37AB114C3EAC9CE1FD4ED097"},
@@ -84,48 +111,28 @@
 					{name:"user", value: "10223296"},
 				];
 				client.postFormData(new URI("https://account.xiaomi.com/pass/serviceLoginAuth"), variables);
-				//client.get(new URI("https://www.alipay.com"));
+			}
+			private function parseCookies(header:String): Dictionary {
+				var result:Dictionary = new Dictionary();
+				var parse:Function = function(item:String, ...args): void {
+					item = StringUtil.trim(item);
+					var offset:int = item.indexOf("=");
+					var key:String = "", value:String = "";
+					if (offset == -1) {
+						key = item;
+					} else {
+						key = item.substr(0, offset);
+						value = item.substr(offset + 1);
+					}
+					if (key != "") {
+						result[key] = value;
+					}
+				}
+				StringUtil.trim(header).split(";").forEach(parse, null);
+				return result;
 			}
 			protected function button3_clickHandler(event:MouseEvent):void
 			{
-				var request:URLRequest = new URLRequest("https://account.xiaomi.com/pass/serviceLoginAuth");
-				request.method = URLRequestMethod.POST;
-				request.contentType = "application/x-www-form-urlencoded";
-				request.requestHeaders['User-Agent'] = "MiTalk 2.1.39 (OptiPlex 990; Windows8; zh-CN)";
-//				request.followRedirects = false;
-				var params:URLVariables = new URLVariables();
-				params['hash'] = '04AD8D3A37AB114C3EAC9CE1FD4ED097';
-				params['sid'] = 'miliao';
-				params['time'] = '1';
-				params['user'] = "10223296";
-				request.data = params;
-				
-				var loader:URLLoader = new URLLoader();
-				loader.addEventListener(ProgressEvent.PROGRESS, onLoaderProgress);
-				loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, onHttpStatusReceived);
-				loader.addEventListener(Event.COMPLETE, onRequestComplete);
-				loader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-				loader.load(request);
-			}
-			private function onLoaderProgress(event:ProgressEvent): void
-			{
-				trace(event.bytesLoaded + ", " + event.bytesTotal);
-			}
-			private function onHttpStatusReceived(event:HTTPStatusEvent): void
-			{
-				var loader:URLLoader = URLLoader(event.target);
-				loader.close();
-				trace(event.responseURL);
-			}
-			private function onIOError(event:IOErrorEvent): void
-			{
-				trace(event);
-			}
-			private function onRequestComplete(event:Event): void
-			{
-				var loader:URLLoader = URLLoader(event.target);
-				trace("completeHandler: " + loader.data);
-				trace();
 			}
 			protected function onSocketConnected( event:ConnectionSuccessEvent ):void
 			{
