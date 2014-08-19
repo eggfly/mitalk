@@ -77,7 +77,6 @@
 					trace(event);
 				}
 				client.listener.onComplete = function(event:HttpResponseEvent):void {
-					trace(event.toString());
 					var location:String = "";
 					var userId:String = "";
 					var passToken:String = "";
@@ -96,13 +95,12 @@
 						} else if (vars[PassTokenKey]) {
 							passToken = vars[PassTokenKey];
 						}
-//						var value:String = StringUtil.trim(item['value']);
-//						if (value.indexOf(UserIdKey) >= 0) {
-//							userId = new URLVariables().decode(value)[UserIdKey];
-//						} else if (value.indexOf(PassTokenKey) >= 0) {
-//							passToken = new URLVariables().decode(value)[PassTokenKey];
-//						}
 					}
+					var extensionObject:Object = JSON.parse(extensionPragma);
+					var ssecurity:String = extensionObject['ssecurity'];
+					var nonce:int = extensionObject['nonce'];
+					var psecurity:String = extensionObject['psecurity'];
+					
 				}
 				var variables:Array = [
 					{name:"hash", value:"04AD8D3A37AB114C3EAC9CE1FD4ED097"},
