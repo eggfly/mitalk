@@ -6,46 +6,19 @@
 	<fx:Script>
 		<![CDATA[
 			import com.adobe.net.URI;
-			import com.adobe.viewsource.ViewSource;
-			import com.facebook.graph.Facebook;
-			import com.facebook.graph.data.FacebookAuthResponse;
-			import com.pixelbreaker.ui.osx.MacMouseWheel;
-			import com.yourpalmark.chat.ChatManager;
-			import com.yourpalmark.chat.data.ChatRoom;
-			import com.yourpalmark.chat.data.LoginCredentials;
 			
-			import mx.collections.ArrayCollection;
-			import mx.events.CloseEvent;
-			import mx.events.FlexEvent;
-			import mx.events.ListEvent;
-			import mx.events.ResizeEvent;
-			import mx.managers.PopUpManager;
 			import mx.utils.StringUtil;
 			
 			import org.httpclient.HttpClient;
-			import org.httpclient.events.HttpDataEvent;
 			import org.httpclient.events.HttpErrorEvent;
 			import org.httpclient.events.HttpResponseEvent;
 			import org.httpclient.events.HttpStatusEvent;
-			import org.igniterealtime.xiff.collections.events.CollectionEvent;
-			import org.igniterealtime.xiff.conference.Room;
-			import org.igniterealtime.xiff.core.UnescapedJID;
 			import org.igniterealtime.xiff.core.XMPPConnection;
-			import org.igniterealtime.xiff.data.Message;
-			import org.igniterealtime.xiff.data.Presence;
-			import org.igniterealtime.xiff.data.im.RosterGroup;
-			import org.igniterealtime.xiff.data.im.RosterItemVO;
 			import org.igniterealtime.xiff.events.ConnectionSuccessEvent;
 			import org.igniterealtime.xiff.events.DisconnectionEvent;
 			import org.igniterealtime.xiff.events.IncomingDataEvent;
-			import org.igniterealtime.xiff.events.InviteEvent;
-			import org.igniterealtime.xiff.events.LoginEvent;
 			import org.igniterealtime.xiff.events.MessageEvent;
 			import org.igniterealtime.xiff.events.OutgoingDataEvent;
-			import org.igniterealtime.xiff.events.PresenceEvent;
-			import org.igniterealtime.xiff.events.RegistrationSuccessEvent;
-			import org.igniterealtime.xiff.events.RosterEvent;
-			import org.igniterealtime.xiff.events.XIFFErrorEvent;
 			
 			private var connection:XMPPConnection = new XMPPConnection();
 			
