@@ -5,6 +5,7 @@
 			   backgroundColor="#E2E2E2">
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.crypto.SHA1;
 			import com.adobe.net.URI;
 			
 			import mx.utils.StringUtil;
@@ -73,7 +74,15 @@
 					var ssecurity:String = extensionObject['ssecurity'];
 					var nonce:int = extensionObject['nonce'];
 					var psecurity:String = extensionObject['psecurity'];
+					// save userId, passToken and ssecurity(ServiceSecurity) to local storage
+					var beforeEncodeString:String = 'nonce=' + nonce + "&" + ssecurity;
+					var clientSign:String = SHA1.hashToBase64(beforeEncodeString);
 					
+					var client:HttpClient = new HttpClient();
+					client.listener.onComplete = function(event:HttpResponseEvent): void {
+						
+					}
+					var params:Array = [name: "hash"];
 				}
 				var variables:Array = [
 					{name:"hash", value:"04AD8D3A37AB114C3EAC9CE1FD4ED097"},
